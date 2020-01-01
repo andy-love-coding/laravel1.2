@@ -23,6 +23,8 @@ class UsersController extends Controller
             'name' => 'required|max:50',
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|confirmed|min:6'
+        ], [
+            'name.required' => '名字都不写，想咋地？'
         ]);
         return;
     }
