@@ -12,7 +12,7 @@ class UsersController extends Controller
     {
         // 登录权限控制，除了这几个方法外，其余方法需要登录访问
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store']
+            'except' => ['show', 'create', 'store', 'index']
         ]);
 
         // 只让未登录用户访问：注册页面
@@ -29,6 +29,12 @@ class UsersController extends Controller
     public function show(User $user)
     {
         return view('users.show', compact('user'));
+    }
+
+    public function index()
+    {
+        $users = User::paginate(10);
+        return view('users.index', compact('users'));
     }
 
     public function store(Request $request)
