@@ -16,6 +16,13 @@ class UserPolicy
     // 调用时，默认情况下，我们 不需要 传递当前登录用户至该方法内
     public function update(User $currentUser, User $user)
     {
+        // 只能自己更新自己
         return $currentUser->id === $user->id;
+    }
+
+    public function destroy(User $currentUser, User $user)
+    {
+        // 只有管理可以删除，并且自己不能删除自己
+        return $currentUser->is_admin && $currentUser->id !== $user->id;
     }
 }
