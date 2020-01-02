@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -12,7 +13,7 @@ class UsersController extends Controller
     {
         // 登录权限控制，除了这几个方法外，其余方法需要登录访问
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'index']
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
         // 只让未登录用户访问：注册页面
@@ -53,8 +54,8 @@ class UsersController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        Auth::login($user);
-        session()->flash('success', '欢迎，您将在理开启一段新的旅程~');
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success', '验证邮件已发送到你的注册邮箱，请注意查收。');
         return redirect()->route('users.show', [$user]); // route() 方法会自动获取 Model 的主键，同[$user->id]
     }
 
@@ -90,5 +91,33 @@ class UsersController extends Controller
         $user->delete();
         session()->flash('success', '成功删除用户！');
         return back();
+    }
+
+    // 发送激活邮件
+    public function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm'; // 邮件视图
+        $data = compact('user');  // 传给邮件视图的数据
+        $from = '000@qq.com';     // 发件人邮箱
+        $name = 'andy';           // 发件人姓名
+        $to   = $user->email;     // 收件人邮箱
+        $subject = '感谢注册 Weibo 应用！请激活你的邮箱账号。'; // 邮件标题
+        Mail::send($view, $data, function($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    // 点击激活链接后，执行的激活动作
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '恭喜你，激活成功！');
+        return redirect()->route('users.show', [$user]);
     }
 }
