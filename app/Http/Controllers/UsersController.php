@@ -98,12 +98,15 @@ class UsersController extends Controller
     {
         $view = 'emails.confirm'; // 邮件视图
         $data = compact('user');  // 传给邮件视图的数据
-        $from = '000@qq.com';     // 发件人邮箱
-        $name = 'andy';           // 发件人姓名
+        // $from = '000@qq.com';     // 发件人邮箱
+        // $name = 'andy';           // 发件人姓名
         $to   = $user->email;     // 收件人邮箱
         $subject = '感谢注册 Weibo 应用！请激活你的邮箱账号。'; // 邮件标题
-        Mail::send($view, $data, function($message) use ($from, $name, $to, $subject) {
-            $message->from($from, $name)->to($to)->subject($subject);
+        // Mail::send($view, $data, function($message) use ($from, $name, $to, $subject) {
+        //     $message->from($from, $name)->to($to)->subject($subject);
+        // });
+        Mail::send($view, $data, function($message) use ($to, $subject) {
+            $message->to($to)->subject($subject);
         });
     }
 
