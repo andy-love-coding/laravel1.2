@@ -52,8 +52,11 @@ class User extends Authenticatable
 
     public function feed()
     {
-        return $this->statuses()
-                    ->orderBy('created_at', 'desc');
+        $user_ids = $this->followings->pluck('id')->toArray();
+        array_push($user_ids, $this->id);
+        return Status::whereIn('user_id', $user_ids)
+                            ->with('user') // with()预加载，避免N+1问题
+                            ->orderBy('created_at', 'desc');
     }
 
     // 本model为：关注人（博主）。关注人的粉丝列表
