@@ -1,3 +1,5 @@
+<!-- 关注列表 && 粉丝列表 -->
+{{-- 模板注释不会显示在前端 --}}
 @extends('layouts.default')
 @section('title', $title)
 

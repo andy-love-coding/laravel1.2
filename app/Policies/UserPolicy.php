@@ -25,4 +25,10 @@ class UserPolicy
         // 只有管理可以删除，并且自己不能删除自己
         return $currentUser->is_admin && $currentUser->id !== $user->id;
     }
+
+    // 自己不能关注自己
+    public function follow(User $currentUser, User $user)
+    {
+        return $currentUser->id !== $user->id;
+    }
 }
