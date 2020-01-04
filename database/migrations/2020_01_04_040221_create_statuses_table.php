@@ -13,7 +13,7 @@ class CreateStatusesTable extends Migration
      */
     public function up()
     {
-        Schema::create('status', function (Blueprint $table) {
+        Schema::create('statuses', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('content');
             $table->integer('user_id')->index(); // 需要根据 user_id 查询用户发布的微博
