@@ -55,4 +55,42 @@ class User extends Authenticatable
         return $this->statuses()
                     ->orderBy('created_at', 'desc');
     }
+
+    // 本model为：关注人（博主）。关注人的粉丝列表
+    public function followers()
+    {
+        // $this-> belongsToMany(关联表model，中间表表名，中间表中本model的关联ID，中间表中关联model的关联ID);
+        // 第二参数为中间表表名，第三参数为本model关联键user_id，第四参数为关联model中关联键follower_id
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    // 本model为：粉丝。粉丝的关注人列表
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+    }
+
+    // 关注
+    public function follow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids, false);
+    }
+
+    // 取关
+    public function unfollow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
+    }
+
+    // 是否关注了
+    public function isFollowing($user_id)
+    {
+        return $this->followings()->contains($user_id);
+    }
 }
